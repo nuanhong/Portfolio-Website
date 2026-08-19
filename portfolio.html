@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - ผลงานของฉัน</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #ffffff;
+            background-color: #030007;
+            position: relative;
+            padding: 50px 80px;
+        }
+
+        /* 1. พื้นหลังเนบิวลาแบบจางและนุ่มนวล */
+        .nebula-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .nebula-static {
+            position: absolute;
+            bottom: -300px;
+            left: -300px;
+            width: 900px;
+            height: 900px;
+            background: radial-gradient(circle, rgba(147, 51, 234, 0.2) 0%, rgba(37, 99, 235, 0.1) 40%, transparent 70%);
+            filter: blur(140px);
+            border-radius: 50%;
+        }
+
+        /* 2. พาร์ติเคิลแบบบางเบา */
+        .particle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .sparkle-box {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 1px;
+            opacity: 0;
+            animation: smoothTwinkle var(--duration) infinite ease-in-out var(--delay);
+        }
+
+        @keyframes smoothTwinkle {
+            0%, 100% { opacity: 0.05; transform: scale(0.8); }
+            50% { opacity: 0.5; transform: scale(1); }
+        }
+
+        /* 3. แสงเบลอตามเมาส์ (แบบอ่อนโยน) */
+        .mouse-glow {
+            position: fixed;
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, rgba(56, 189, 248, 0.04) 50%, transparent 75%);
+            filter: blur(60px);
+            pointer-events: none;
+            z-index: 4;
+            transform: translate(-50%, -50%);
+            transition: left 0.15s ease-out, top 0.15s ease-out;
+        }
+
+        /* Navigation Bar ด้านบน */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            color: #ffffff;
+            text-decoration: none;
+            opacity: 0.9;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #ffffff;
+        }
+
+        /* Main Content แบบโล่งๆ */
+        main {
+            max-width: 1000px;
+            width: 100%;
+            margin: 60px auto;
+            z-index: 10;
+        }
+
+        .section-header {
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 400;
+            letter-spacing: -0.5px;
+            color: #f8fafc;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* รายการผลงานแบบเรียบง่าย (Minimal List Layout) */
+        .portfolio-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .project-row {
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 30px 35px;
+            border-radius: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .project-row:hover {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(168, 85, 247, 0.2);
+            transform: translateX(4px);
+        }
+
+        .project-info {
+            max-width: 650px;
+        }
+
+        .project-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #a78bfa;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .project-title {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .project-desc {
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .project-action {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+            white-space: nowrap;
+            padding-left: 20px;
+        }
+
+        .project-row:hover .project-action {
+            color: #38bdf8;
+        }
+
+        /* Footer แบบโปร่ง */
+        footer {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #475569;
+            z-index: 10;
+            padding-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 30px 20px; }
+            .nav-links { display: none; }
+            .project-row { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .project-action { padding-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- พื้นหลังเนบิวลาและพาร์ติเคิล -->
+    <div class="nebula-container">
+        <div class="nebula-static"></div>
+    </div>
+    
+    <div class="particle-container" id="particleContainer"></div>
+
+    <!-- แสงเบลอตามเมาส์ -->
+    <div class="mouse-glow" id="glow"></div>
+
+    <!-- เมนูด้านบน -->
+    <nav>
+        <a href="index.html" class="logo">PORTFOLIO</a>
+        <ul class="nav-links">
+            <li><a href="index.html">เกี่ยวกับฉัน</a></li>
+            <li><a href="portfolio.html" class="active">ผลงาน</a></li>
+            <li><a href="contact.html">ติดต่อฉัน</a></li>
+        </ul>
+    </nav>
+
+    <!-- เนื้อหาหลัก -->
+    <main>
+        <div class="section-header">
+            <h1>Selected Works</h1>
+            <p class="subtitle">รวบรวมโปรเจกต์แปลภาษา ม็อดเกม และงานพัฒนาที่ผ่านมา</p>
+        </div>
+
+        <div class="portfolio-list">
+            <!-- ชิ้นงานที่ 1 -->
+            <a href="#" class="project-row">
+                <div class="project-info">
+                    <span class="project-tag">Translation / Mod</span>
+                    <h2 class="project-title">Medieval Dynasty ภาษาไทย</h2>
+                    <p class="project-desc">ม็อดแปลภาษาไทยสำหรับเกมแนวเอาชีวิตรอดและสร้างหมู่บ้าน เพื่อให้เข้าถึงเนื้อเรื่องและระบบเกมได้สมบูรณ์ยิ่งขึ้น</p>
+                </div>
+                <div class="project-action">ดูรายละเอียด &rarr;</div>
+            </a>
+
+            <!-- ชิ้นงานที่ 2 -->
+            <a href="#" class="project-row">
+                <div class="project-info">
+                    <span class="project-tag">Web Development</span>
+                    <h2 class="project-title">Space Portfolio Website</h2>
+                    <p class="project-desc">เว็บไซต์ส่วนตัวดีไซน์แนวอวกาศ เน้นความเรียบง่าย สบายตา และแอนิเมชันที่นุ่มนวล</p>
+                </div>
+                <div class="project-action">ดูรายละเอียด &rarr;</div>
+            </a>
+
+            <!-- ชิ้นงานที่ 3 -->
+            <a href="#" class="project-row">
+                <div class="project-info">
+                    <span class="project-tag">Future Project</span>
+                    <h2 class="project-title">Upcoming Translation Project</h2>
+                    <p class="project-desc">พื้นที่สำหรับอัปเดตโปรเจกต์แปลเกมตัวถัดไปที่กำลังจะเริ่มดำเนินการเร็วๆ นี้</p>
+                </div>
+                <div class="project-action">ติดตาม &rarr;</div>
+            </a>
+        </div>
+    </main>
+
+    <!-- ส่วนท้าย -->
+    <footer>
+        <p>&copy; 2026 All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // ควบคุมแสงตามเมาส์
+        const glow = document.getElementById('glow');
+        window.addEventListener('mousemove', (e) => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+
+        // สร้างพาร์ติเคิลแบบบางเบา
+        const particleContainer = document.getElementById('particleContainer');
+        const particleCount = 25; // ลดจำนวนลงเพื่อให้ดูโล่งสบายตาขึ้น
+
+        for (let i = 0; i < particleCount; i++) {
+            const box = document.createElement('div');
+            box.classList.add('sparkle-box');
+
+            const posX = Math.random() * 100;
+            const posY = Math.random() * 100;
+            const size = Math.random() * 2 + 1; // ขนาดเล็กลง
+            const duration = Math.random() * 6 + 6;
+            const delay = -(Math.random() * duration);
+
+            box.style.left = `${posX}vw`;
+            box.style.top = `${posY}vh`;
+            box.style.width = `${size}px`;
+            box.style.height = `${size}px`;
+            box.style.setProperty('--duration', `${duration}s`);
+            box.style.setProperty('--delay', `${delay}s`);
+
+            particleContainer.appendChild(box);
+        }
+    </script>
+</body>
+</html>
