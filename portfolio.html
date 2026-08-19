@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portfolio - ผลงานของฉัน</title>
+
+    <!-- 1. ดึง Swiper CSS มาใช้ออกแบบสไลด์ 3D ในโทรศัพท์ -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
     <style>
         * {
             margin: 0;
@@ -15,15 +19,16 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #ffffff;
             background-color: #030007;
             position: relative;
-            padding: 50px 80px;
+            padding: 40px 20px;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
         }
 
-        /* 1. พื้นหลังเนบิวลาแบบจางและนุ่มนวล */
+        /* 1. พื้นหลังเนบิวลา */
         .nebula-container {
             position: fixed;
             top: 0;
@@ -45,7 +50,7 @@
             border-radius: 50%;
         }
 
-        /* 2. พาร์ติเคิลแบบบางเบา */
+        /* 2. พาร์ติเคิล */
         .particle-container {
             position: fixed;
             top: 0;
@@ -69,7 +74,7 @@
             50% { opacity: 0.5; transform: scale(1); }
         }
 
-        /* 3. แสงเบลอตามเมาส์ (แบบอ่อนโยน) */
+        /* 3. แสงตามเมาส์ */
         .mouse-glow {
             position: fixed;
             width: 350px;
@@ -83,7 +88,7 @@
             transition: left 0.15s ease-out, top 0.15s ease-out;
         }
 
-        /* Navigation Bar ด้านบน */
+        /* Navigation Bar */
         nav {
             display: flex;
             justify-content: space-between;
@@ -120,16 +125,22 @@
             color: #ffffff;
         }
 
-        /* Main Content แบบโล่งๆ */
+        /* Main Content */
         main {
-            max-width: 1000px;
+            max-width: 1200px;
             width: 100%;
-            margin: 60px auto;
+            margin: 0 auto;
             z-index: 10;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
         }
 
         .section-header {
-            margin-bottom: 50px;
+            margin-top: 30px;
+            margin-bottom: 20px;
         }
 
         h1 {
@@ -137,112 +148,381 @@
             font-weight: 400;
             letter-spacing: -0.5px;
             color: #f8fafc;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .subtitle {
             color: #64748b;
-            font-size: 1rem;
-            line-height: 1.6;
+            font-size: 0.95rem;
         }
 
-        /* รายการผลงานแบบเรียบง่าย (Minimal List Layout) */
-        .portfolio-list {
+        /* Layout หลักตรงกลาง */
+        .showcase-area {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            height: 480px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1400px;
+        }
+
+        /* SVG สำหรับวาดเส้นเชื่อมโยง */
+        .connection-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .connection-line {
+            fill: none;
+            stroke: rgba(168, 85, 247, 0.6);
+            stroke-width: 2;
+            stroke-dasharray: 6 4;
+            animation: dashMove 20s linear infinite;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .connection-line.active {
+            opacity: 1;
+        }
+
+        @keyframes dashMove {
+            to { stroke-dashoffset: -1000; }
+        }
+
+        /* 3D Circular Carousel Wrapper */
+        .carousel-container {
+            position: relative;
+            width: 300px;
+            height: 440px;
+            perspective: 1200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 6;
+        }
+
+        .carousel-track {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            cursor: grab;
+        }
+
+        .carousel-track:active {
+            cursor: grabbing;
+        }
+
+        /* กรอบมือถือใส (Phone Frame 3D) */
+        .phone-frame {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 220px;
+            height: 360px;
+            margin-left: -110px;
+            margin-top: -180px;
+            background: rgba(15, 23, 42, 0.65);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 36px;
+            padding: 24px 10px 15px 10px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            user-select: none;
+            will-change: transform, opacity;
+            transition: border-color 0.4s ease, background 0.4s ease, box-shadow 0.4s ease;
+            overflow: hidden;
         }
 
-        .project-row {
-            background: rgba(255, 255, 255, 0.015);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            padding: 30px 35px;
-            border-radius: 14px;
+        .phone-frame::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            z-index: 10;
+        }
+
+        .phone-frame.active-card {
+            border-color: rgba(168, 85, 247, 0.8);
+            background: rgba(15, 23, 42, 0.85);
+            box-shadow: 0 0 50px rgba(168, 85, 247, 0.4);
+        }
+
+        /* --- Swiper 3D ด้านในมือถือ --- */
+        .phone-swiper {
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+        }
+
+        .swiper-slide {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 12px;
             display: flex;
+            flex-direction: column;
             justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            color: inherit;
+            text-align: left;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
         }
 
-        .project-row:hover {
-            background: rgba(255, 255, 255, 0.03);
-            border-color: rgba(168, 85, 247, 0.2);
-            transform: translateX(4px);
+        .swiper-slide img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 8px;
         }
 
-        .project-info {
-            max-width: 650px;
-        }
-
-        .project-tag {
-            font-size: 0.75rem;
+        .phone-tag {
+            font-size: 0.6rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #a78bfa;
-            margin-bottom: 8px;
+            margin-bottom: 2px;
             display: block;
         }
 
-        .project-title {
-            font-size: 1.25rem;
+        .phone-title {
+            font-size: 0.85rem;
             font-weight: 500;
             color: #ffffff;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
-        .project-desc {
-            color: #64748b;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .project-action {
+        .phone-desc {
             color: #94a3b8;
-            font-size: 0.9rem;
-            transition: color 0.3s ease;
-            white-space: nowrap;
-            padding-left: 20px;
+            font-size: 0.65rem;
+            line-height: 1.3;
         }
 
-        .project-row:hover .project-action {
+        .phone-action {
             color: #38bdf8;
+            font-size: 0.65rem;
+            font-weight: 500;
+            margin-top: 4px;
         }
 
-        /* Footer แบบโปร่ง */
+        .swiper-pagination-bullet {
+            background: rgba(255, 255, 255, 0.4) !important;
+        }
+
+        .swiper-pagination-bullet-active {
+            background: #a78bfa !important;
+            width: 16px !important;
+            border-radius: 4px !important;
+        }
+
+        /* --- ฝั่งซ้าย: กล่องรายละเอียด --- */
+        .side-detail-card {
+            position: absolute;
+            left: 30px;
+            width: 310px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.15);
+            text-align: left;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 6;
+            will-change: transform, opacity;
+            transform: perspective(1000px) rotateY(15deg) scale(0.95) translateY(10px);
+        }
+
+        .side-detail-card.active-side {
+            opacity: 1;
+            pointer-events: auto;
+            transform: perspective(1000px) rotateY(12deg) scale(1) translateY(0);
+        }
+
+        .side-tag {
+            font-size: 0.7rem;
+            color: #a78bfa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .side-title {
+            font-size: 1.2rem;
+            color: #ffffff;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .side-body p {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .side-features {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .side-features li {
+            color: #cbd5e1;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .side-features li::before {
+            content: "✦";
+            color: #a78bfa;
+            font-size: 0.65rem;
+        }
+
+        .side-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #38bdf8;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: opacity 0.2s ease;
+        }
+
+        .side-link:hover {
+            opacity: 0.8;
+        }
+
+        /* --- ฝั่งขวา: กรอบรูปภาพ --- */
+        .side-image-card {
+            position: absolute;
+            right: 30px;
+            width: 320px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            border-radius: 20px;
+            padding: 15px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.15);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 6;
+            will-change: transform, opacity;
+            transform: perspective(1000px) rotateY(-15deg) scale(0.95) translateY(10px);
+        }
+
+        .side-image-card.active-side {
+            opacity: 1;
+            pointer-events: auto;
+            transform: perspective(1000px) rotateY(-12deg) scale(1) translateY(0);
+        }
+
+        .image-wrapper {
+            width: 100%;
+            height: 200px;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            background: #111;
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .side-image-card:hover .image-wrapper img {
+            transform: scale(1.05);
+        }
+
+        .image-caption {
+            margin-top: 12px;
+            padding: 0 5px;
+            text-align: left;
+        }
+
+        .image-caption-title {
+            font-size: 0.9rem;
+            color: #ffffff;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .image-caption-sub {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .hint-text {
+            font-size: 0.8rem;
+            color: #475569;
+            margin-top: 20px;
+            letter-spacing: 0.5px;
+        }
+
         footer {
             max-width: 1200px;
             width: 100%;
-            margin: 0 auto;
+            margin: 40px auto 0 auto;
             text-align: center;
             font-size: 0.85rem;
             color: #475569;
             z-index: 10;
-            padding-top: 20px;
         }
 
-        @media (max-width: 768px) {
-            body { padding: 30px 20px; }
-            .nav-links { display: none; }
-            .project-row { flex-direction: column; align-items: flex-start; gap: 15px; }
-            .project-action { padding-left: 0; }
+        @media (max-width: 1000px) {
+            .showcase-area {
+                height: auto;
+                flex-direction: column;
+                gap: 30px;
+            }
+            .side-detail-card, .side-image-card {
+                position: relative;
+                left: auto;
+                right: auto;
+                width: 100%;
+                max-width: 400px;
+                transform: none !important;
+            }
+            .connection-svg { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <!-- พื้นหลังเนบิวลาและพาร์ติเคิล -->
     <div class="nebula-container">
         <div class="nebula-static"></div>
     </div>
     
     <div class="particle-container" id="particleContainer"></div>
-
-    <!-- แสงเบลอตามเมาส์ -->
     <div class="mouse-glow" id="glow"></div>
 
-    <!-- เมนูด้านบน -->
     <nav>
         <a href="index.html" class="logo">PORTFOLIO</a>
         <ul class="nav-links">
@@ -252,50 +532,188 @@
         </ul>
     </nav>
 
-    <!-- เนื้อหาหลัก -->
     <main>
         <div class="section-header">
             <h1>Selected Works</h1>
-            <p class="subtitle">รวบรวมโปรเจกต์แปลภาษา ม็อดเกม และงานพัฒนาที่ผ่านมา</p>
+            <p class="subtitle">หมุนโทรศัพท์เพื่อเลือกโปรเจกต์ และปัดสไลด์ 3D ด้านในหน้าจอเพื่อดูมุมมองต่างๆ</p>
         </div>
 
-        <div class="portfolio-list">
-            <!-- ชิ้นงานที่ 1 -->
-            <a href="#" class="project-row">
-                <div class="project-info">
-                    <span class="project-tag">Translation / Mod</span>
-                    <h2 class="project-title">Medieval Dynasty ภาษาไทย</h2>
-                    <p class="project-desc">ม็อดแปลภาษาไทยสำหรับเกมแนวเอาชีวิตรอดและสร้างหมู่บ้าน เพื่อให้เข้าถึงเนื้อเรื่องและระบบเกมได้สมบูรณ์ยิ่งขึ้น</p>
-                </div>
-                <div class="project-action">ดูรายละเอียด &rarr;</div>
-            </a>
+        <div class="showcase-area" id="showcaseArea">
+            <svg class="connection-svg" id="connectionSvg">
+                <path class="connection-line" id="line-0" d="" />
+                <path class="connection-line" id="line-1" d="" />
+                <path class="connection-line" id="line-2" d="" />
+            </svg>
 
-            <!-- ชิ้นงานที่ 2 -->
-            <a href="#" class="project-row">
-                <div class="project-info">
-                    <span class="project-tag">Web Development</span>
-                    <h2 class="project-title">Space Portfolio Website</h2>
-                    <p class="project-desc">เว็บไซต์ส่วนตัวดีไซน์แนวอวกาศ เน้นความเรียบง่าย สบายตา และแอนิเมชันที่นุ่มนวล</p>
+            <!-- ฝั่งซ้าย -->
+            <div class="side-detail-card" id="side-left-0">
+                <span class="side-tag">Translation / Mod</span>
+                <h3 class="side-title">Medieval Dynasty ภาษาไทย</h3>
+                <div class="side-body">
+                    <p>ม็อดแปลภาษาไทยสำหรับเกม Medieval Dynasty ช่วยให้ผู้เล่นไทยเข้าใจเนื้อเรื่อง เควสต์ และระบบหมู่บ้านได้ลึกซึ้งยิ่งขึ้น</p>
+                    <ul class="side-features">
+                        <li>แปลเนื้อหาเควสต์และบทสนทนากว่า 90%</li>
+                        <li>ฟอนต์ไทยอ่านง่าย เข้ากับบรรยากาศยุคกลาง</li>
+                    </ul>
+                    <a href="#" class="side-link">เยี่ยมชมหน้าโปรเจกต์ &rarr;</a>
                 </div>
-                <div class="project-action">ดูรายละเอียด &rarr;</div>
-            </a>
+            </div>
 
-            <!-- ชิ้นงานที่ 3 -->
-            <a href="#" class="project-row">
-                <div class="project-info">
-                    <span class="project-tag">Future Project</span>
-                    <h2 class="project-title">Upcoming Translation Project</h2>
-                    <p class="project-desc">พื้นที่สำหรับอัปเดตโปรเจกต์แปลเกมตัวถัดไปที่กำลังจะเริ่มดำเนินการเร็วๆ นี้</p>
+            <div class="side-detail-card" id="side-left-1">
+                <span class="side-tag">Web Development</span>
+                <h3 class="side-title">Space Portfolio Website</h3>
+                <div class="side-body">
+                    <p>เว็บไซต์พอร์ตโฟลิโอส่วนตัวดีไซน์ Minimal Space เน้นอนิเมชั่นความลื่นไหลและแสงเนบิวลาที่สบายตา</p>
+                    <ul class="side-features">
+                        <li>ดีไซน์ Modern Glassmorphism</li>
+                        <li>ระบบ 3D Carousel ฟิสิกส์แรงเหวี่ยง</li>
+                    </ul>
+                    <a href="#" class="side-link">ดูซอร์สโค้ดเพิ่มเติม &rarr;</a>
                 </div>
-                <div class="project-action">ติดตาม &rarr;</div>
-            </a>
+            </div>
+
+            <div class="side-detail-card" id="side-left-2">
+                <span class="side-tag">Future Project</span>
+                <h3 class="side-title">Upcoming Translation Project</h3>
+                <div class="side-body">
+                    <p>พื้นที่เตรียมความพร้อมสำหรับโปรเจกต์แปลเกมหรือซอฟต์แวร์ชิ้นถัดไป พร้อมเปิดรับฟังเสียงโหวตจากคอมมูนิตี้</p>
+                    <ul class="side-features">
+                        <li>กำลังคัดเลือกเกมแนว RPG หรือ Survival</li>
+                        <li>เปิดรับข้อเสนอแนะจากผู้ติดตาม</li>
+                    </ul>
+                    <a href="#" class="side-link">ติดตามการอัปเดต &rarr;</a>
+                </div>
+            </div>
+
+            <!-- วงล้อหมุน 3 มิติโทรศัพท์ตรงกลาง -->
+            <div class="carousel-container" id="carouselContainer">
+                <div class="carousel-track" id="carouselTrack">
+                    
+                    <!-- โทรศัพท์ 1 (ใส่ Swiper 3D ด้านใน) -->
+                    <div class="phone-frame" data-index="0">
+                        <div class="swiper phone-swiper">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide">
+                                    <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=400&q=80" alt="Slide 1">
+                                    <div>
+                                        <span class="phone-tag">Mod</span>
+                                        <h2 class="phone-title">Medieval Dynasty</h2>
+                                        <p class="phone-desc">ระบบเควสภาษาไทยสมบูรณ์</p>
+                                    </div>
+                                    <div class="phone-action">ปัดสไลด์ &rarr;</div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=400&q=80" alt="Slide 2">
+                                    <div>
+                                        <span class="phone-tag">UI Thai</span>
+                                        <h2 class="phone-title">In-Game Menu</h2>
+                                        <p class="phone-desc">ปรับฟอนต์เมนูอ่านง่ายสบายตา</p>
+                                    </div>
+                                    <div class="phone-action">ปัดสไลด์ &rarr;</div>
+                                </div>
+                            </div>
+                            <div class="swiper-pagination"></div>
+                        </div>
+                    </div>
+
+                    <!-- โทรศัพท์ 2 (ใส่ Swiper 3D ด้านใน) -->
+                    <div class="phone-frame" data-index="1">
+                        <div class="swiper phone-swiper">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide">
+                                    <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=400&q=80" alt="Slide 1">
+                                    <div>
+                                        <span class="phone-tag">Web Dev</span>
+                                        <h2 class="phone-title">Space Portfolio</h2>
+                                        <p class="phone-desc">ธีมเนบิวลาอวกาศ Glassmorphism</p>
+                                    </div>
+                                    <div class="phone-action">ปัดสไลด์ &rarr;</div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <img src="https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=400&q=80" alt="Slide 2">
+                                    <div>
+                                        <span class="phone-tag">Responsive</span>
+                                        <h2 class="phone-title">Mobile First</h2>
+                                        <p class="phone-desc">รองรับทุกขนาดหน้าจอ</p>
+                                    </div>
+                                    <div class="phone-action">ปัดสไลด์ &rarr;</div>
+                                </div>
+                            </div>
+                            <div class="swiper-pagination"></div>
+                        </div>
+                    </div>
+
+                    <!-- โทรศัพท์ 3 (ใส่ Swiper 3D ด้านใน) -->
+                    <div class="phone-frame" data-index="2">
+                        <div class="swiper phone-swiper">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide">
+                                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80" alt="Slide 1">
+                                    <div>
+                                        <span class="phone-tag">Future</span>
+                                        <h2 class="phone-title">Upcoming Project</h2>
+                                        <p class="phone-desc">เตรียมพบกับม็อดเกมถัดไป</p>
+                                    </div>
+                                    <div class="phone-action">ปัดสไลด์ &rarr;</div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <img src="https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?auto=format&fit=crop&w=400&q=80" alt="Slide 2">
+                                    <div>
+                                        <span class="phone-tag">Voting</span>
+                                        <h2 class="phone-title">Community Vote</h2>
+                                        <p class="phone-desc">เปิดให้โหวตเลือกเกมที่จะแปล</p>
+                                    </div>
+                                    <div class="phone-action">ปัดสไลด์ &rarr;</div>
+                                </div>
+                            </div>
+                            <div class="swiper-pagination"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ฝั่งขวา -->
+            <div class="side-image-card" id="side-right-0">
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=600&q=80" alt="Medieval Dynasty Preview">
+                </div>
+                <div class="image-caption">
+                    <div class="image-caption-title">Screenshots & Gameplay</div>
+                    <div class="image-caption-sub">ภาพตัวอย่างบรรยากาศภายในเกมภาษาไทย</div>
+                </div>
+            </div>
+
+            <div class="side-image-card" id="side-right-1">
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80" alt="Space Portfolio Preview">
+                </div>
+                <div class="image-caption">
+                    <div class="image-caption-title">UI & Glassmorphism Design</div>
+                    <div class="image-caption-sub">ตัวอย่างเลย์เอาต์และการจัดวางองค์ประกอบ</div>
+                </div>
+            </div>
+
+            <div class="side-image-card" id="side-right-2">
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80" alt="Upcoming Project Preview">
+                </div>
+                <div class="image-caption">
+                    <div class="image-caption-title">Concept Art & Planning</div>
+                    <div class="image-caption-sub">แนวคิดเบื้องต้นสำหรับโปรเจกต์ถัดไป</div>
+                </div>
+            </div>
         </div>
+
+        <div class="hint-text">← ลากหมุนวงโคจร หรือใช้นิ้ว/เมาส์ปัดสไลด์ 3D ด้านในหน้าจอมือถือได้เลย →</div>
     </main>
 
-    <!-- ส่วนท้าย -->
     <footer>
         <p>&copy; 2026 All Rights Reserved.</p>
     </footer>
+
+    <!-- 2. ดึง Swiper JS มาเปิดใช้งาน -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
     <script>
         // ควบคุมแสงตามเมาส์
@@ -305,29 +723,209 @@
             glow.style.top = e.clientY + 'px';
         });
 
-        // สร้างพาร์ติเคิลแบบบางเบา
+        // สร้างพาร์ติเคิล
         const particleContainer = document.getElementById('particleContainer');
-        const particleCount = 25; // ลดจำนวนลงเพื่อให้ดูโล่งสบายตาขึ้น
-
+        const particleCount = 25;
         for (let i = 0; i < particleCount; i++) {
             const box = document.createElement('div');
             box.classList.add('sparkle-box');
-
             const posX = Math.random() * 100;
             const posY = Math.random() * 100;
-            const size = Math.random() * 2 + 1; // ขนาดเล็กลง
+            const size = Math.random() * 2 + 1;
             const duration = Math.random() * 6 + 6;
             const delay = -(Math.random() * duration);
-
             box.style.left = `${posX}vw`;
             box.style.top = `${posY}vh`;
             box.style.width = `${size}px`;
             box.style.height = `${size}px`;
             box.style.setProperty('--duration', `${duration}s`);
             box.style.setProperty('--delay', `${delay}s`);
-
             particleContainer.appendChild(box);
         }
+
+        // --- เปิดใช้งาน Swiper Effect Coverflow 3D ภายในหน้าจอมือถือ ---
+        const swipers = new Swiper('.phone-swiper', {
+            effect: 'coverflow',
+            grabCursor: true,
+            centeredSlides: true,
+            slidesPerView: 'auto',
+            coverflowEffect: {
+                rotate: 30,
+                stretch: 0,
+                depth: 80,
+                modifier: 1,
+                slideShadows: false,
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            // ป้องกันการลาก Swiper แล้วไปตีกับการลาก Carousel ใหญ่
+            nested: true 
+        });
+
+        // ระบบ 3D Carousel วงกลมใหญ่
+        const track = document.getElementById('carouselTrack');
+        const cards = document.querySelectorAll('.phone-frame');
+        const leftCards = document.querySelectorAll('.side-detail-card');
+        const rightCards = document.querySelectorAll('.side-image-card');
+        const lines = document.querySelectorAll('.connection-line');
+        const showcaseArea = document.getElementById('showcaseArea');
+        const radius = 260;
+        
+        let currentAngle = 0;
+        let targetAngle = 0;
+        let velocity = 0;
+        let isDragging = false;
+        let startX = 0;
+        let lastX = 0;
+        let lastTime = 0;
+        let lastActiveIndex = -1;
+
+        function updateConnectionLines(activeIndex) {
+            const areaRect = showcaseArea.getBoundingClientRect();
+            const activePhone = cards[activeIndex];
+            const activeLeft = document.getElementById(`side-left-${activeIndex}`);
+            const activeRight = document.getElementById(`side-right-${activeIndex}`);
+            const activeLine = document.getElementById(`line-${activeIndex}`);
+
+            if (!activePhone || !activeLeft || !activeRight || !activeLine) return;
+
+            const phoneRect = activePhone.getBoundingClientRect();
+            const rightRect = activeRight.getBoundingClientRect();
+
+            const phoneX = (phoneRect.left + phoneRect.width / 2) - areaRect.left;
+            const phoneY = (phoneRect.top + phoneRect.height / 2) - areaRect.top;
+
+            const targetX = (rightRect.left + 10) - areaRect.left;
+            const targetY = (rightRect.top + rightRect.height / 2) - areaRect.top;
+
+            const dx = Math.abs(targetX - phoneX) * 0.45;
+            const pathData = `M ${phoneX} ${phoneY} C ${phoneX + dx} ${phoneY}, ${targetX - dx} ${targetY}, ${targetX} ${targetY}`;
+            
+            activeLine.setAttribute('d', pathData);
+        }
+
+        function animate() {
+            if (!isDragging) {
+                velocity *= 0.92;
+                targetAngle += velocity;
+            }
+
+            currentAngle += (targetAngle - currentAngle) * 0.08;
+
+            const totalCards = cards.length;
+            let closestIndex = 0;
+            let minDistance = Infinity;
+
+            cards.forEach((card, index) => {
+                const angle = (index / totalCards) * 360 + currentAngle;
+                const radian = (angle * Math.PI) / 180;
+                
+                const x = Math.sin(radian) * radius;
+                const z = Math.cos(radian) * radius - radius; 
+                
+                const distanceToFront = Math.abs(Math.cos(radian) - 1);
+                if (distanceToFront < minDistance) {
+                    minDistance = distanceToFront;
+                    closestIndex = index;
+                }
+
+                const baseScale = (z + radius * 2) / (radius * 2);
+                const scale = Math.max(0.7, baseScale);
+                const opacity = Math.max(0.3, scale);
+
+                card.style.transform = `translateX(${x}px) translateZ(${z}px) scale(${scale * (baseScale > 0.9 ? 1.15 : 1)})`;
+                card.style.zIndex = Math.round(scale * 100);
+                card.style.opacity = opacity;
+            });
+
+            cards.forEach((card, index) => {
+                if (index === closestIndex) {
+                    card.classList.add('active-card');
+                } else {
+                    card.classList.remove('active-card');
+                }
+            });
+
+            if (closestIndex !== lastActiveIndex) {
+                leftCards.forEach((card, index) => {
+                    card.classList.toggle('active-side', index === closestIndex);
+                });
+
+                rightCards.forEach((card, index) => {
+                    card.classList.toggle('active-side', index === closestIndex);
+                });
+
+                lines.forEach((line, index) => {
+                    line.classList.toggle('active', index === closestIndex);
+                });
+
+                lastActiveIndex = closestIndex;
+            }
+
+            if (window.innerWidth > 1000) {
+                updateConnectionLines(closestIndex);
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        cards.forEach((card, index) => {
+            card.addEventListener('click', (e) => {
+                // ถ้าสไลด์รูปในมือถือ จะไม่สั่งให้วงโคจรหมุน
+                if(e.target.closest('.phone-swiper')) return;
+                
+                if (Math.abs(velocity) < 0.5) {
+                    const totalCards = cards.length;
+                    targetAngle = - (index * (360 / totalCards));
+                }
+            });
+        });
+
+        function startDrag(clientX) {
+            isDragging = true;
+            startX = clientX;
+            lastX = clientX;
+            lastTime = performance.now();
+            velocity = 0;
+        }
+
+        function onDrag(clientX) {
+            if (!isDragging) return;
+            const now = performance.now();
+            const deltaX = clientX - lastX;
+            const deltaTime = now - lastTime;
+
+            targetAngle += deltaX * 0.25;
+            
+            if (deltaTime > 0) {
+                velocity = (deltaX / deltaTime) * 4;
+            }
+
+            lastX = clientX;
+            lastTime = now;
+        }
+
+        function endDrag() {
+            isDragging = false;
+        }
+
+        track.addEventListener('mousedown', (e) => {
+            if(e.target.closest('.phone-swiper')) return;
+            startDrag(e.clientX);
+        });
+        window.addEventListener('mousemove', (e) => onDrag(e.clientX));
+        window.addEventListener('mouseup', endDrag);
+
+        track.addEventListener('touchstart', (e) => {
+            if(e.target.closest('.phone-swiper')) return;
+            startDrag(e.touches[0].clientX);
+        });
+        window.addEventListener('touchmove', (e) => onDrag(e.touches[0].clientX));
+        window.addEventListener('touchend', endDrag);
     </script>
 </body>
 </html>
